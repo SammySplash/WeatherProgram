@@ -7,6 +7,17 @@
 
 import UIKit
 
+enum Link {
+    case openWeatherMapAPI
+    
+    var url: URL? {
+        switch self {
+            case .openWeatherMapAPI:
+            URL(string: "https://api.openweathermap.org/data/2.5/weather?lat=39.06983&lon=-9.37174&appid=2cd38519fec3038fa17a5d9cbd3ef35d&units=metric")
+        }
+    }
+}
+
 enum Alert {
     case success
     case failure
@@ -43,26 +54,19 @@ private extension MainViewController {
     func fetchWeather() {
         showActivityIndicator()
         
-        let url = "https://yahoo-weather5.p.rapidapi.com/weather?location=S%C3%A3o%20Pedro%20da%20Cadeira&format=json&u=c"
-        guard let url = URL(string: url) else {
+        guard let url = Link.openWeatherMapAPI.url else {
             print("Invalid URL")
             return
         }
         
-        let headers = [
-            "x-rapidapi-host": "yahoo-weather5.p.rapidapi.com",
-            "x-rapidapi-key": "d68f19ebbdmshd781a2a159cb03ep1de912jsn0889134c43d4"
-        ]
-        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
         
         URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
             guard let self = self else { return }
             
             guard let data = data else {
-                self.handleError("No data received.")
+                self.handleError(error?.localizedDescription ?? "No data received.")
                 return
             }
             
@@ -97,9 +101,9 @@ private extension MainViewController {
             DispatchQueue.main.async { [weak self] in
                 self?.hideActivityIndicator()
                 self?.showAlert(withStatus: .success)
-                print(weatherResponse.location.city)
-                print(weatherResponse.current_observation.condition.temperature)
-                print(weatherResponse.forecasts.first?.text ?? "No forecast available")
+                print("You've chosen a \(weatherResponse.name), \(weatherResponse.sys.country)")
+                print("Air temperature now is \(weatherResponse.main.temp) and feels like \(weatherResponse.main.feelsLike) degrees Celsius.")
+                print("Wind speed: \(weatherResponse.wind.speed) m/s.")
             }
         } catch {
             handleError(error.localizedDescription)
