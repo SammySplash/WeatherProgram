@@ -45,7 +45,7 @@ struct Main: Codable {
     let humidity: Int
     let seaLevel: Int?
     let grndLevel: Int?
-
+    
     enum CodingKeys: String, CodingKey {
         case temp
         case feelsLike = "feels_like"
@@ -66,7 +66,7 @@ struct Wind: Codable {
 
 struct Rain: Codable {
     let oneHour: Double?
-
+    
     enum CodingKeys: String, CodingKey {
         case oneHour = "1h"
     }
@@ -82,4 +82,12 @@ struct Sys: Codable {
     let country: String
     let sunrise: Int
     let sunset: Int
+}
+
+extension Weather {
+    func getIconURL() -> URL? {
+        let iconCode = self.icon
+        let iconURLString = "https://openweathermap.org/img/wn/\(iconCode)@2x.png"
+        return URL(string: iconURLString)
+    }
 }
